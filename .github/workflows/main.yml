@@ -13,34 +13,34 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on:
+      ubuntu-latest
 
-     # This is the list of steps this job will run.
+      # This is the list of steps this job will run.
     steps:
       # First of all, we clone the repo using the checkout action.
       - name: Checkout
         uses: actions/checkout@master
- 
+
       # We use the arduino/setup-arduino-cli action to install and
       # configure the Arduino CLI on the system.
       - name: Setup Arduino CLI
         uses: arduino/setup-arduino-cli@v1.0.0
- 
+
       # We then install the platform, which one will be determined
       # dynamically by the build matrix.
       - name: Install platform
         run: |
-          arduino-cli core update-index --additional-urls https://github.com/bigjosh/Move38-Arduino-Platform/releases/latest/download/package_move38.com-blinks_index.json
+          arduino-cli core update-index --additional-urls https://boardsmanager.com/package_move38.com-blinks_index.json
           arduino-cli core install arduino:avr
-          arduino-cli core install move38:avr --additional-urls https://github.com/bigjosh/Move38-Arduino-Platform/releases/latest/download/package_move38.com-blinks_index.json
- 
+          arduino-cli core install move38:avr --additional-urls https://boardsmanager.com/package_move38.com-blinks_index.json
+
       # Finally, we compile the sketch
       - name: Compile Sketch
         run: arduino-cli compile --fqbn move38:avr:blink --output-dir ./build ./frogs
-      
+
       - name: Upload Sketch
         uses: actions/upload-artifact@v2
         with:
           name: compiled-game-code
           path: ./build/
-        
