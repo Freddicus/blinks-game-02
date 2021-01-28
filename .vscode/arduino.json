@@ -1,0 +1,7 @@
+{
+    "board": "move38:avr:blink",
+    "sketch": "frogs/sketch.ino",
+    "output": "build",
+    "port": "dummy",
+    "programmer": "USBtinyISP"
+}
