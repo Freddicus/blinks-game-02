@@ -13,8 +13,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on:
-      ubuntu-latest
+    runs-on: ubuntu-latest
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
@@ -22,7 +21,7 @@ jobs:
     steps:
       # First of all, we clone the repo using the checkout action.
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@master
 
       # We use the arduino/setup-arduino-cli action to install and
       # configure the Arduino CLI on the system.
@@ -39,7 +38,7 @@ jobs:
 
       # Finally, we compile the sketch
       - name: Compile Sketch
-        run: arduino-cli compile --fqbn move38:avr:blink --output-dir ./build ./frogs
+        run: arduino-cli compile --fqbn move38:avr:blink --output-dir ./build ./sketch
 
       - name: Upload Sketch
         uses: actions/upload-artifact@v2
