@@ -43,6 +43,8 @@ void setup() {
 }
 
 void loop() {
+  setValueSentOnAllFaces(Messages::NO_MSG);
+
   // if double-clicked toggle lily pad / frog
   if (buttonDoubleClicked()) {
     if (blinkState == BlinkStates::LILY_PAD || blinkState == BlinkStates::GOLDEN_LILY_PAD) {
@@ -69,9 +71,10 @@ void loop() {
     }
   }
 
-  // -------
+  // ---------------------------------
+  // ------------ LILY PAD LOOP ------
+  // ---------------------------------
 
-  // if lily pad
   if (blinkState == BlinkStates::LILY_PAD) {
     // always send out lily pad message
     setValueSentOnAllFaces(Messages::I_AM_A_LILY_PAD);
@@ -93,12 +96,33 @@ void loop() {
     }
   }
 
+  // ---------------------------------
+  // ----- GOLDEN LILY PAD LOOP ------
+  // ---------------------------------
+
   if (blinkState == BlinkStates::GOLDEN_LILY_PAD) {
     setValueSentOnAllFaces(Messages::I_AM_A_GOLDEN_LILY_PAD);
     if (buttonLongPressed()) {
       isGoldenLilyPadLockedIn = true;
     }
-  }
+    FOREACH_FACE(f) {
+      if (!isValueReceivedOnFaceExpired(f) && getLastValueReceivedOnFace(f) == Messages::I_AM_A_FROG) {
+        didFrogWin = true;
+      }
+    }
+  } // golden lily pad
+
+  // -----------------------
+  // ----- WATER LOOP ------
+  // -----------------------
+
+  if (blinkState == BlinkStates::WATER) {
+    setValueSentOnAllFaces(Messages::I_AM_WATER);
+  } // water
+
+  // ----------------------
+  // ----- FROG LOOP ------
+  // ----------------------
 
   if (blinkState == BlinkStates::FROG) {
     // always send out frog message
@@ -140,10 +164,6 @@ void loop() {
       didFrogLoseEnergyFromLilyPad = false;
       didFrogLoseEnergyFromWater = false;
     }
-
-    if (blinkState == BlinkStates::WATER) {
-      setValueSentOnAllFaces(Messages::I_AM_WATER);
-    }
   }  // frog routine
   displayLoop();
 }  // main loop
@@ -167,8 +187,7 @@ void displayLoop() {
       }
       break;
     case BlinkStates::GOLDEN_LILY_PAD:
-      // TODO: replace isAlone with frog detect
-      if (isGoldenLilyPadLockedIn && isAlone()) {
+      if (isGoldenLilyPadLockedIn && !didFrogWin) {
         setColor(LILY_PAD_GREEN);
         setColorOnFace(OFF, 0);
       } else {
