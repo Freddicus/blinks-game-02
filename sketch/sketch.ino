@@ -17,6 +17,10 @@ enum Messages {
 byte blinkState = BlinkStates::LILY_PAD;
 bool didFrogLand = false;
 byte frogEnergy = 0;
+#define FROG_LIGHT_GREEN MAKECOLOR_5BIT_RGB(176 >> 3, 242 >> 3, 10 >> 3);
+#define FROG_DARK_GREEN MAKECOLOR_5BIT_RGB(42 >> 3, 94 >> 3, 3 >> 3);
+#define LILY_PAD_GREEN MAKECOLOR_5BIT_RGB(90 >> 3, 140 >> 3, 3 >> 3);
+#define ENERGY_PINK MAKECOLOR_5BIT_RGB(245 >> 3, 144 >> 3, 190 >> 3);
 
 void setup() {
   randomize();
@@ -65,7 +69,10 @@ void loop() {
       }
     }
     // -- if breakage, send broke message and turn to water
-    // TODO: if frog leaves, set didFrogLand to false
+    // if frog leaves, set didFrogLand to false
+    if (isAlone()) {
+      didFrogLand = false;
+    }
   }
 
   if (blinkState == BlinkStates::GOLDEN_LILY_PAD) {
@@ -93,13 +100,13 @@ void loop() {
 void displayLoop() {
   switch (blinkState) {
     case BlinkStates::LILY_PAD:
-      setColor(GREEN);
+      setColor(LILY_PAD_GREEN);
       setColorOnFace(OFF, 0);
       break;
     case BlinkStates::FROG:
       setColor(GREEN);
-      setColorOnFace(OFF, 0);
-      setColorOnFace(OFF, 3);
+      setColorOnFace(FROG_LIGHT_GREEN, 0);
+      setColorOnFace(FROG_DARK_GREEN, 3);
       showEnergy();
       break;
     case BlinkStates::GOLDEN_LILY_PAD:
@@ -128,7 +135,7 @@ void determineFrogEnergy() {
 }
 
 void showEnergy() {
-  if (millis() % 3000 > 1500) {
+  if ((millis() % 4000 > 1000)  || (buttonDown())) {
     FOREACH_FACE(f) {
       if (frogEnergy == 0) {
         setColorOnFace(RED, f);
