@@ -18,7 +18,10 @@ enum Messages {
 };
 
 byte blinkState = BlinkStates::LILY_PAD;
+bool isGoldenLilyPadLockedIn = false;
+
 bool didFrogLand = false;
+bool didFrogWin = false;
 
 // frog variables
 byte frogEnergy = 0;
@@ -27,12 +30,15 @@ bool didFrogLoseEnergyFromWater = false;
 
 #define FROG_LIGHT_GREEN MAKECOLOR_5BIT_RGB(176 >> 3, 242 >> 3, 10 >> 3)
 #define FROG_DARK_GREEN MAKECOLOR_5BIT_RGB(42 >> 3, 94 >> 3, 3 >> 3)
+
+#define FROG_LIGHT_YELLOW MAKECOLOR_5BIT_RGB(255 >> 3, 255 >> 3, 180 >> 3)
+#define FROG_DARK_YELLOW MAKECOLOR_5BIT_RGB(80 >> 3, 80 >> 3, 0)
+
 #define LILY_PAD_GREEN MAKECOLOR_5BIT_RGB(90 >> 3, 140 >> 3, 3 >> 3)
 #define ENERGY_PINK MAKECOLOR_5BIT_RGB(245 >> 3, 144 >> 3, 190 >> 3)
 
 void setup() {
   Serial.begin();
-  Serial.println("Serial init success!");
   randomize();
 }
 
@@ -41,8 +47,10 @@ void loop() {
   if (buttonDoubleClicked()) {
     if (blinkState == BlinkStates::LILY_PAD || blinkState == BlinkStates::GOLDEN_LILY_PAD) {
       blinkState = BlinkStates::FROG;
+      isGoldenLilyPadLockedIn = false;
     } else if (blinkState == BlinkStates::FROG) {
       blinkState = BlinkStates::LILY_PAD;
+      didFrogWin = false;
     } else if (blinkState == BlinkStates::WATER) {
       blinkState = BlinkStates::LILY_PAD;
     } else {
@@ -86,7 +94,10 @@ void loop() {
   }
 
   if (blinkState == BlinkStates::GOLDEN_LILY_PAD) {
-    setValueSentOnAllFaces(Messages::I_AM_A_LILY_PAD);
+    setValueSentOnAllFaces(Messages::I_AM_A_GOLDEN_LILY_PAD);
+    if (buttonLongPressed()) {
+      isGoldenLilyPadLockedIn = true;
+    }
   }
 
   if (blinkState == BlinkStates::FROG) {
@@ -100,26 +111,30 @@ void loop() {
     FOREACH_FACE(f) {
       if (!isValueReceivedOnFaceExpired(f) && getLastValueReceivedOnFace(f) == Messages::I_AM_A_LILY_PAD) {
         if (!didFrogLoseEnergyFromLilyPad) {
-          --frogEnergy;
+          decreaseFrogEnergy(1);
           didFrogLoseEnergyFromLilyPad = true;
         }
+      }
+
+      if (!isValueReceivedOnFaceExpired(f) && getLastValueReceivedOnFace(f) == Messages::I_AM_A_GOLDEN_LILY_PAD) {
+        didFrogWin = true;
       }
 
       if (!isValueReceivedOnFaceExpired(f) && getLastValueReceivedOnFace(f) == Messages::I_AM_WATER) {
         // we were on a lily pad, we didn't lose energy from water yet, and we need to lose one more energy
         if (didFrogLoseEnergyFromLilyPad && !didFrogLoseEnergyFromWater) {
-          --frogEnergy;
+          decreaseFrogEnergy(1);
           didFrogLoseEnergyFromLilyPad = true;
         }
 
         // if we landed on water, then we need to lose two energy
         if (!didFrogLoseEnergyFromLilyPad && !didFrogLoseEnergyFromWater) {
-          frogEnergy -= 2;
+          decreaseFrogEnergy(2);
           didFrogLoseEnergyFromLilyPad = true;
           didFrogLoseEnergyFromWater = true;
         }
       }
-    }
+    }  // for each face
 
     if (isAlone()) {
       didFrogLoseEnergyFromLilyPad = false;
@@ -129,9 +144,9 @@ void loop() {
     if (blinkState == BlinkStates::WATER) {
       setValueSentOnAllFaces(Messages::I_AM_WATER);
     }
-  }
+  }  // frog routine
   displayLoop();
-}
+}  // main loop
 
 void displayLoop() {
   switch (blinkState) {
@@ -140,14 +155,26 @@ void displayLoop() {
       setColorOnFace(OFF, 0);
       break;
     case BlinkStates::FROG:
-      setColor(GREEN);
-      setColorOnFace(FROG_LIGHT_GREEN, 0);
-      setColorOnFace(FROG_DARK_GREEN, 3);
-      showEnergy();
+      if (didFrogWin) {
+        setColor(YELLOW);
+        setColorOnFace(FROG_LIGHT_YELLOW, 0);
+        setColorOnFace(FROG_DARK_YELLOW, 3);
+      } else {
+        setColor(GREEN);
+        setColorOnFace(FROG_LIGHT_GREEN, 0);
+        setColorOnFace(FROG_DARK_GREEN, 3);
+        showEnergy();
+      }
       break;
     case BlinkStates::GOLDEN_LILY_PAD:
-      setColor(YELLOW);
-      setColorOnFace(OFF, 0);
+      // TODO: replace isAlone with frog detect
+      if (isGoldenLilyPadLockedIn && isAlone()) {
+        setColor(LILY_PAD_GREEN);
+        setColorOnFace(OFF, 0);
+      } else {
+        setColor(YELLOW);
+        setColorOnFace(OFF, 0);
+      }
       break;
     case BlinkStates::WATER:
       setColor(BLUE);
@@ -171,7 +198,7 @@ void determineFrogEnergy() {
 }
 
 void showEnergy() {
-  if ((millis() % 1000 > 900)) {
+  if ((millis() % 1500 > 1000)) {
     FOREACH_FACE(f) {
       if (frogEnergy == 0) {
         setColorOnFace(RED, f);
@@ -184,4 +211,12 @@ void showEnergy() {
       }  // frogEnergy == 0
     }    // for-each face
   }      // millis
+}
+
+void decreaseFrogEnergy(byte numEnergyLost) {
+  if (frogEnergy <= numEnergyLost) {
+    frogEnergy = 0;
+  } else {
+    frogEnergy -= numEnergyLost;
+  }
 }
