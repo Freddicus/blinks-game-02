@@ -29,6 +29,8 @@ void loop() {
       blinkState = BlinkStates::FROG;
     } else if (blinkState == BlinkStates::FROG) {
       blinkState = BlinkStates::LILY_PAD;
+    } else if (blinkState == BlinkStates::WATER) {
+      blinkState = BlinkStates::LILY_PAD;
     } else {
       // future token states?
     }
@@ -53,17 +55,17 @@ void loop() {
     setValueSentOnAllFaces(Messages::I_AM_A_LILY_PAD);
     // -- if frog attached, randomize breakage
     FOREACH_FACE(f) {
-      if (getLastValueReceivedOnFace(f) == Messages::I_AM_A_FROG) {)
+      if (getLastValueReceivedOnFace(f) == Messages::I_AM_A_FROG) {
         if (didLilyPadBreak() && !didFrogLand) {
           blinkState = BlinkStates::WATER;
-        }
-        else if (didFrogLand) {
+        } else if (didFrogLand) {
           // check to see if lily pad breaks from staying on it too long
         }
         didFrogLand = true;
       }
     }
     // -- if breakage, send broke message and turn to water
+    // TODO: if frog leaves, set didFrogLand to false
   }
 
   if (blinkState == BlinkStates::GOLDEN_LILY_PAD) {
@@ -112,7 +114,7 @@ void displayLoop() {
 
 bool didLilyPadBreak() {
   short randomNumber = random(100);
-  if (random % 10) {
+  if (randomNumber % 10) {
     return true;
   } else {
     return false;
@@ -120,11 +122,23 @@ bool didLilyPadBreak() {
 }
 
 void determineFrogEnergy() {
-  while (frogEnergy == 0) {
+  do {
     frogEnergy = (1 + random(99)) % 4;
-  }
+  } while (frogEnergy == 0);
 }
 
 void showEnergy() {
-  // millis()
+  if (millis() % 3000 > 1500) {
+    FOREACH_FACE(f) {
+      if (frogEnergy == 0) {
+        setColorOnFace(RED, f);
+      } else {
+        if (f <= frogEnergy - 1) {
+          setColorOnFace(CYAN, f);
+        } else {
+          setColorOnFace(OFF, f);
+        }
+      }  // frogEnergy == 0
+    }    // for-each face
+  }      // millis
 }
