@@ -83,6 +83,7 @@ void loop() {
       case BlinkStates::GOLDEN_LILY_PAD:
         blinkState = BlinkStates::FROG;
         isGoldenLilyPadLockedIn = false;
+        didFrogWin = false;
         break;
       case BlinkStates::FROG:
         blinkState = BlinkStates::LILY_PAD;
