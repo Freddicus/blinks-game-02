@@ -26,9 +26,9 @@ The last player to see a frog in person goes first. If no one has seen a frog in
 
 Players take turns hopping from lily pad to lily pad in search of the golden lily pad, which attracts all of the delicious flies. Click your frog to see how many hops your frog can take on its turn. The number of hops a frog can take is shown briefly every couple of seconds.
 
-Hop to a lily pad by attaching your frog to an adjacent lily pad Blink. For the first hop of the game, players must chose any outer lily pad. This costs one hop. You can hop to water tiles, but this costs two hops total.
+Hop to a lily pad by attaching your frog to an adjacent lily pad Blink. For the first hop of the game, players must chose any outer lily pad. This costs one hop.
 
-There is a small chance that when your frog lands on the lily pad, it will break and turn to water, which will cost another hop. If you don't have enough hops left, you lose a turn. This will be indicated by a red energy indicator.
+There is a small chance that when your frog lands on the lily pad, it will break and turn to water, which will cost another hop. If you don't have at least one hop left after landing, you lose a turn. The Blink will let the player know by a flashing red during the normal energy indicator display loop. You can hop to water tiles, but this costs two hops total.
 
 First to find the golden lily pad wins!
 
