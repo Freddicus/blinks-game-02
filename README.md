@@ -28,13 +28,13 @@ Players take turns hopping from lily pad to lily pad in search of the golden lil
 
 Hop to a lily pad by attaching your frog to an adjacent lily pad Blink. For the first hop of the game, players must chose any outer lily pad. This costs one hop.
 
-There is a small chance that when your frog lands on the lily pad, it will break and turn to water, which will cost another hop. If you don't have at least one hop left after landing, you lose a turn. The Blink will let the player know by a flashing red during the normal energy indicator display loop. You can hop to water tiles, but this costs two hops total.
+There is a small chance that when your frog lands on the lily pad, it will break and turn to water, which will cost another hop. If you don't have at least one hop left after landing, you lose a turn. The Blink will let the player know if you've lost a turn by flashing red during the normal energy display loop. You can hop to water tiles, but this costs two hops total.
 
 First to find the golden lily pad wins!
 
 ### Advanced Play Options
 
-* You can single-click any lily pad to turn it into a water obstacle.
+* During setup (or at any time, if you'd like), you may single-click any lily pad to turn it into a water obstacle.
 * You can make each player start on the same lily pad.
 * You can have more than one golden lily pad to find if you have a very large amount of Blinks.
 
