@@ -18,15 +18,15 @@ When the Blinks are done learning the game, each Blink will start as a lily pad.
 
 Choose one of the lily pads to turn into a golden lily pad. Triple-clicking a lily pad will turn it into a golden lily pad. Long press to lock in your decision and hide its color. You can reset the golden status of locked in lily pads by switching to a frog and back again.
 
-A player should now secretly shuffle the now hidden golden lily pad in with the normal lily pads. Lay out the lily pads in the playing field. None of the lily pads should touch each other. Keep them about four inches apart. If any lily pads stick during play, simply detach them and play on.
+A player will then secretly shuffle the now-hidden golden lily pad in with the normal lily pads. Lay out the lily pads in the playing field. None of the lily pads should touch each other. Keep them about four inches apart. If any lily pads accidentally touch during play, simply detach them and play on.
 
 ### Play
 
 The last player to see a frog in person goes first. If no one has seen a frog in recent memory, the youngest player goes first.
 
-Players take turns hopping from lily pad to lily pad in search of the golden lily pad, which attracts all of the delicious flies. Click your frog to see how many hops your frog can take on its turn. The number of hops a frog can take is shown breifly every couple of seconds.
+Players take turns hopping from lily pad to lily pad in search of the golden lily pad, which attracts all of the delicious flies. Click your frog to see how many hops your frog can take on its turn. The number of hops a frog can take is shown briefly every couple of seconds.
 
-Hop to a lily pad by attaching your frog the lily pad Blink. This costs one hop. You can hop to water tiles, but this costs two hops total.
+Hop to a lily pad by attaching your frog to an adjacent lily pad Blink. For the first hop of the game, players must chose any outer lily pad. This costs one hop. You can hop to water tiles, but this costs two hops total.
 
 There is a small chance that when your frog lands on the lily pad, it will break and turn to water, which will cost another hop. If you don't have enough hops left, you lose a turn. This will be indicated by a red energy indicator.
 
@@ -34,7 +34,7 @@ First to find the golden lily pad wins!
 
 ### Advanced Play Options
 
-* You can single-click any lily pad to turn it into a water obsticle.
+* You can single-click any lily pad to turn it into a water obstacle.
 * You can make each player start on the same lily pad.
 * You can have more than one golden lily pad to find if you have a very large amount of Blinks.
 
