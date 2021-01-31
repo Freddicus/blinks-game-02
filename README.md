@@ -6,6 +6,10 @@ Follow along on the [blog](https://games.freddicus.com/ggj-2021/blog)!
 
 ## Story
 
+> Once upon a time, there were a bunch of frogs. They were going to have a fly breakfast. So the sat on a golden lily pad. But the flies got lost on it. The frogs went home to eat more flies, but they didn't know where they were. All they remembered is that they were on a golden lily pad. So they went to search for one. It's was fall, so the lily pads could break. They hopped lily pad to lily pad, but they couldn't find the golden lily pad. Then, they saw another lily pad. As soon as they landed on it, it broke! So they had lost two of their energy to find the golden lily pad. There was only one more lily pad left, and this was their last energy! They hopped to the plain green lily pad... And they turned golden _and_ the lily pad turned golden! And they found their flies and ate them.
+
+_~by Julia_
+
 ## How to Play!
 
 I took a page out of the Move38 school of design handbook and avoided the pitfalls of having setup modes in the Blink code. BUT! There _is_ a setup phase for this game. Read on...
