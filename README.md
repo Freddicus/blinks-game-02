@@ -12,7 +12,7 @@ I took a page out of the Move38 school of design handbook and avoided the pitfal
 
 ### Setup
 
-In general this game can be played with as many players as you'd like. I recommend that you have approximately six Blinks per player.
+In general this game can be played with as many players as you'd like. We recommend that you have approximately six Blinks per player.
 
 When the Blinks are done learning the game, each Blink will start as a lily pad. You can double-click a lily pad to turn it into a frog. Double-click a frog to turn it back into a lily pad. Make sure each player has a frog.
 
@@ -43,9 +43,8 @@ Game start:
 Win condition:
 * You can have more than one golden lily pad to find if you have a very large amount of Blinks.
 
-#### Selecting 
-
 ## Resources
 
-- https://globalgamejam.org/2021/jam-sites/playcrafting
-- https://forum.move38.com/t/10-reasons-to-jam-this-year/842
+- [Global Game Jam 2021 | Playcrafting](https://globalgamejam.org/2021/jam-sites/playcrafting)
+- [Move38 Forum post](https://forum.move38.com/t/10-reasons-to-jam-this-year/842)
+- [Freddicus Game Studios](https://games.freddicus.com/ggj-2021)
