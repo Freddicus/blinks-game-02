@@ -32,10 +32,15 @@ There is a small chance that when your frog lands on the lily pad, it will break
 
 First to find the golden lily pad wins!
 
-### Advanced Play Options
+### Alternate Play Options
 
-* During setup (or at any time, if you'd like), you may single-click any lily pad to turn it into a water obstacle.
+Water tiles:
+* Change up the game by single-clicking any lily pad to turn it into a water tile. When you're done shuffling the lily pads, create boundaries in the playing field with the water tiles to force players to make choices about their search patterns.
+
+Game start:
 * You can make each player start on the same lily pad.
+
+Win condition:
 * You can have more than one golden lily pad to find if you have a very large amount of Blinks.
 
 #### Selecting 
