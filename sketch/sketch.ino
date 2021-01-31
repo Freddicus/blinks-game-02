@@ -46,6 +46,7 @@ void setup() {
 }
 
 void loop() {
+  throwAwayWakingClicks();
   setValueSentOnAllFaces(Messages::NO_MSG);
 
   // ---------------------
@@ -77,6 +78,7 @@ void loop() {
 
   if (buttonDoubleClicked()) {
     switch (blinkState) {
+      case BlinkStates::WATER:
       case BlinkStates::LILY_PAD:
       case BlinkStates::GOLDEN_LILY_PAD:
         blinkState = BlinkStates::FROG;
@@ -85,9 +87,6 @@ void loop() {
       case BlinkStates::FROG:
         blinkState = BlinkStates::LILY_PAD;
         didFrogWin = false;
-        break;
-      case BlinkStates::WATER:
-        blinkState = BlinkStates::LILY_PAD;
         break;
     }
   }
@@ -291,5 +290,14 @@ void decreaseFrogEnergy(byte numEnergyLost) {
     frogEnergy = 0;
   } else {
     frogEnergy -= numEnergyLost;
+  }
+}
+
+void throwAwayWakingClicks() {
+  if (hasWoken()) {
+    buttonSingleClicked();
+    buttonDoubleClicked();
+    buttonMultiClicked();
+    buttonPressed();
   }
 }
