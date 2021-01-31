@@ -1,7 +1,7 @@
 {
     "board": "move38:avr:blink",
     "sketch": "sketch/sketch.ino",
-    "output": "build",
+    "output": "../build/",
     "port": "dummy",
     "programmer": "USBtinyISP"
 }

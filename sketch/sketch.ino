@@ -1,7 +1,3 @@
-#include "Serial.h"
-
-ServicePortSerial Serial;
-
 enum BlinkStates {
   LILY_PAD,
   GOLDEN_LILY_PAD,
@@ -23,10 +19,18 @@ bool isGoldenLilyPadLockedIn = false;
 bool didFrogLand = false;
 bool didFrogWin = false;
 
+bool lostATurn = false;
+
 // frog variables
 byte frogEnergy = 0;
 bool didFrogLoseEnergyFromLilyPad = false;
 bool didFrogLoseEnergyFromWater = false;
+
+// Timers
+Timer sparkleTimer;
+
+#define FROG_DISPLAY_TIME_MS 1500
+#define ENERGY_DISPLAY_TIME_MS 500
 
 #define FROG_LIGHT_GREEN MAKECOLOR_5BIT_RGB(176 >> 3, 242 >> 3, 10 >> 3)
 #define FROG_DARK_GREEN MAKECOLOR_5BIT_RGB(42 >> 3, 94 >> 3, 3 >> 3)
@@ -34,40 +38,72 @@ bool didFrogLoseEnergyFromWater = false;
 #define FROG_LIGHT_YELLOW MAKECOLOR_5BIT_RGB(255 >> 3, 255 >> 3, 180 >> 3)
 #define FROG_DARK_YELLOW MAKECOLOR_5BIT_RGB(80 >> 3, 80 >> 3, 0)
 
-#define LILY_PAD_GREEN MAKECOLOR_5BIT_RGB(90 >> 3, 140 >> 3, 3 >> 3)
+#define LILY_PAD_GREEN MAKECOLOR_5BIT_RGB(10, 29, 1)
 #define ENERGY_PINK MAKECOLOR_5BIT_RGB(245 >> 3, 144 >> 3, 190 >> 3)
 
 void setup() {
-  Serial.begin();
   randomize();
 }
 
 void loop() {
   setValueSentOnAllFaces(Messages::NO_MSG);
 
-  // if double-clicked toggle lily pad / frog
-  if (buttonDoubleClicked()) {
-    if (blinkState == BlinkStates::LILY_PAD || blinkState == BlinkStates::GOLDEN_LILY_PAD) {
-      blinkState = BlinkStates::FROG;
-      isGoldenLilyPadLockedIn = false;
-    } else if (blinkState == BlinkStates::FROG) {
-      blinkState = BlinkStates::LILY_PAD;
-      didFrogWin = false;
-    } else if (blinkState == BlinkStates::WATER) {
-      blinkState = BlinkStates::LILY_PAD;
-    } else {
-      // future token states?
+  // ---------------------
+  // --- SINGLE CLICK ----
+  // ---------------------
+
+  if (buttonSingleClicked()) {
+    switch (blinkState) {
+      case BlinkStates::LILY_PAD:
+      case BlinkStates::GOLDEN_LILY_PAD:
+        blinkState = BlinkStates::WATER;
+        break;
+      case BlinkStates::WATER:
+        if (isGoldenLilyPadLockedIn) {
+          blinkState = BlinkStates::GOLDEN_LILY_PAD;
+        } else {
+          blinkState = BlinkStates::LILY_PAD;
+        }
+        break;
+      case BlinkStates::FROG:
+        determineFrogEnergy();
+        break;
     }
   }
 
-  // if triple-clicked, toggle golden
+  // ---------------------
+  // --- DOUBLE CLICK ----
+  // ---------------------
+
+  if (buttonDoubleClicked()) {
+    switch (blinkState) {
+      case BlinkStates::LILY_PAD:
+      case BlinkStates::GOLDEN_LILY_PAD:
+        blinkState = BlinkStates::FROG;
+        isGoldenLilyPadLockedIn = false;
+        break;
+      case BlinkStates::FROG:
+        blinkState = BlinkStates::LILY_PAD;
+        didFrogWin = false;
+        break;
+      case BlinkStates::WATER:
+        blinkState = BlinkStates::LILY_PAD;
+        break;
+    }
+  }
+
+  // ---------------------
+  // ---- MULTI CLICK ----
+  // ---------------------
+
   if (buttonMultiClicked() && buttonClickCount() == 3) {
-    if (blinkState == BlinkStates::LILY_PAD) {
-      blinkState = BlinkStates::GOLDEN_LILY_PAD;
-    } else if (blinkState == BlinkStates::GOLDEN_LILY_PAD) {
-      blinkState = BlinkStates::LILY_PAD;
-    } else {
-      // future states?
+    switch (blinkState) {
+      case BlinkStates::LILY_PAD:
+        blinkState = BlinkStates::GOLDEN_LILY_PAD;
+        break;
+      case BlinkStates::GOLDEN_LILY_PAD:
+        blinkState = BlinkStates::LILY_PAD;
+        break;
     }
   }
 
@@ -89,7 +125,6 @@ void loop() {
         didFrogLand = true;
       }
     }
-    // -- if breakage, send broke message and turn to water
     // if frog leaves, set didFrogLand to false
     if (isAlone()) {
       didFrogLand = false;
@@ -110,7 +145,7 @@ void loop() {
         didFrogWin = true;
       }
     }
-  } // golden lily pad
+  }  // golden lily pad
 
   // -----------------------
   // ----- WATER LOOP ------
@@ -118,7 +153,7 @@ void loop() {
 
   if (blinkState == BlinkStates::WATER) {
     setValueSentOnAllFaces(Messages::I_AM_WATER);
-  } // water
+  }  // water
 
   // ----------------------
   // ----- FROG LOOP ------
@@ -127,28 +162,24 @@ void loop() {
   if (blinkState == BlinkStates::FROG) {
     // always send out frog message
     setValueSentOnAllFaces(Messages::I_AM_A_FROG);
-    // -- if clicked
-    if (buttonSingleClicked()) {
-      determineFrogEnergy();
-    }
-    // -- if lily pad message rx, minus one energy
+
     FOREACH_FACE(f) {
       if (!isValueReceivedOnFaceExpired(f) && getLastValueReceivedOnFace(f) == Messages::I_AM_A_LILY_PAD) {
         if (!didFrogLoseEnergyFromLilyPad) {
           decreaseFrogEnergy(1);
           didFrogLoseEnergyFromLilyPad = true;
         }
-      }
+      }  // attached to lily pad
 
       if (!isValueReceivedOnFaceExpired(f) && getLastValueReceivedOnFace(f) == Messages::I_AM_A_GOLDEN_LILY_PAD) {
         didFrogWin = true;
-      }
+      }  // attached to golden lily pad
 
       if (!isValueReceivedOnFaceExpired(f) && getLastValueReceivedOnFace(f) == Messages::I_AM_WATER) {
         // we were on a lily pad, we didn't lose energy from water yet, and we need to lose one more energy
         if (didFrogLoseEnergyFromLilyPad && !didFrogLoseEnergyFromWater) {
           decreaseFrogEnergy(1);
-          didFrogLoseEnergyFromLilyPad = true;
+          didFrogLoseEnergyFromWater = true;
         }
 
         // if we landed on water, then we need to lose two energy
@@ -157,14 +188,19 @@ void loop() {
           didFrogLoseEnergyFromLilyPad = true;
           didFrogLoseEnergyFromWater = true;
         }
-      }
-    }  // for each face
+      }  // attached to water
+    }    // for each face
 
     if (isAlone()) {
       didFrogLoseEnergyFromLilyPad = false;
       didFrogLoseEnergyFromWater = false;
     }
   }  // frog routine
+
+  // ---------------------
+  // -- UPDATE COLORS ----
+  // ---------------------
+
   displayLoop();
 }  // main loop
 
@@ -179,6 +215,7 @@ void displayLoop() {
         setColor(YELLOW);
         setColorOnFace(FROG_LIGHT_YELLOW, 0);
         setColorOnFace(FROG_DARK_YELLOW, 3);
+        sparkle();
       } else {
         setColor(GREEN);
         setColorOnFace(FROG_LIGHT_GREEN, 0);
@@ -192,12 +229,22 @@ void displayLoop() {
         setColorOnFace(OFF, 0);
       } else {
         setColor(YELLOW);
+        sparkle();
         setColorOnFace(OFF, 0);
       }
       break;
     case BlinkStates::WATER:
       setColor(BLUE);
       break;
+  }
+}
+
+void sparkle() {
+  byte randomFace = random(5);
+  byte randomBrightness = random(50) + 205;
+  if (sparkleTimer.isExpired()) {
+    setColorOnFace(dim(WHITE, randomBrightness), randomFace);
+    sparkleTimer.set(125);
   }
 }
 
@@ -211,16 +258,19 @@ bool didLilyPadBreak() {
 }
 
 void determineFrogEnergy() {
+  lostATurn = false;
   do {
     frogEnergy = (1 + random(99)) % 4;
   } while (frogEnergy == 0);
 }
 
 void showEnergy() {
-  if ((millis() % 1500 > 1000)) {
+  if ((millis() % (FROG_DISPLAY_TIME_MS + ENERGY_DISPLAY_TIME_MS) > FROG_DISPLAY_TIME_MS)) {
     FOREACH_FACE(f) {
-      if (frogEnergy == 0) {
+      if (frogEnergy == 0 && lostATurn) {
         setColorOnFace(RED, f);
+      } else if (frogEnergy == 0 && !lostATurn) {
+        setColorOnFace(MAKECOLOR_5BIT_RGB(1, 1, 1), f);
       } else {
         if (f <= frogEnergy - 1) {
           setColorOnFace(ENERGY_PINK, f);
@@ -233,6 +283,10 @@ void showEnergy() {
 }
 
 void decreaseFrogEnergy(byte numEnergyLost) {
+  if (numEnergyLost > frogEnergy) {
+    lostATurn = true;
+  }
+
   if (frogEnergy <= numEnergyLost) {
     frogEnergy = 0;
   } else {
